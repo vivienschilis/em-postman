@@ -13,6 +13,7 @@ Example
 
 Server postbox: (server.rb)
 
+``` ruby
     require 'em-postman'
 
     EM.run {
@@ -23,11 +24,13 @@ Server postbox: (server.rb)
         postman.send_message data['from'], :greetings, {:message => 'hello ' + data['from']}
       }
 
-      postman.listen 
+      postman.listen
     }
+```
 
 Client postbox: (client.rb)
 
+``` ruby
     require 'em-postman'
 
     EM.run {
@@ -41,7 +44,7 @@ Client postbox: (client.rb)
       postman.send_message 'server', :greetings, {:message => 'hello server', :from => postman.mailbox}
       postman.listen
     }
-
+```
 
 Credits
 =======
