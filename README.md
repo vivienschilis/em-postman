@@ -14,36 +14,36 @@ Example
 Server postbox: (server.rb)
 
 ``` ruby
-    require 'em-postman'
+require 'em-postman'
 
-    EM.run {
-      postman = EM::Postman.new('server')
+EM.run {
+  postman = EM::Postman.new('server')
 
-      postman.onmessage(:greetings) {|data|
-        puts data.inspect
-        postman.send_message data['from'], :greetings, {:message => 'hello ' + data['from']}
-      }
+  postman.onmessage(:greetings) {|data|
+    puts data.inspect
+    postman.send_message data['from'], :greetings, {:message => 'hello ' + data['from']}
+  }
 
-      postman.listen
-    }
+  postman.listen
+}
 ```
 
 Client postbox: (client.rb)
 
 ``` ruby
-    require 'em-postman'
+require 'em-postman'
 
-    EM.run {
+EM.run {
 
-      postman = EM::Postman.new('client-' + Process.pid.to_s)
-      postman.onmessage(:greetings) {|data|
-        puts data.inspect
-        EM.stop
-      }
-  
-      postman.send_message 'server', :greetings, {:message => 'hello server', :from => postman.mailbox}
-      postman.listen
-    }
+  postman = EM::Postman.new('client-' + Process.pid.to_s)
+  postman.onmessage(:greetings) {|data|
+    puts data.inspect
+    EM.stop
+  }
+
+  postman.send_message 'server', :greetings, {:message => 'hello server', :from => postman.mailbox}
+  postman.listen
+}
 ```
 
 Credits
