@@ -7,13 +7,13 @@ describe EventMachine::Postman do
       redis.flushall
       redis
     }
-    
+
     let(:postman) { 
       p = EM::Postman.new('test', :redis => redis)
       p.logger = Logger.new(nil)
       p
     }
-    
+
     it "should send and receve messages asynchronously" do 
         em(1) do
           postman.send_message("test", 'cb', {:value => 'abc'})
@@ -22,27 +22,53 @@ describe EventMachine::Postman do
           postman.onmessage(:cb) do |msg|
             responses << msg
           end
+          postman.onmessage(:cb) do |msg|
+            responses << msg
+          end
           postman.listen
         
           EM.add_timer(0.2) do
+            responses.should == [{"value"=>"abc"}, {"value"=>"abc"}]
+            done
+          end
+        end
+    end
+
+    it "should unregister handlers" do 
+        em(1) do
+          postman.send_message("test", 'cb', {:value => 'abc'})
+          responses = []
+          proc = Proc.new {|msg|
+            responses << msg
+            postman.unlisten(:cb, proc)
+          }
+          postman.onmessage(:cb, &proc)
+
+          postman.listen
+
+          EM.add_timer(0.2) do
+            postman.send_message("test", 'cb', {:value => 'cdf'})
+          end
+
+          EM.add_timer(0.4) do
             responses.should == [{"value"=>"abc"}]
             done
           end
         end
     end
-    
+
     it "should gracefully handle a Redis.rpop error" do
         em(1) do
           redis.lpush("inbox_test", MultiJson.encode({:method => 'cb', :body => 'a'}))
           redis.lpush("inbox_test", "error")
           redis.lpush("inbox_test", MultiJson.encode({:method => 'cb', :body => 'b'}))
-      
+
           responses = []
           postman.onmessage(:cb) do |msg|
             responses << msg
           end
           postman.listen
-      
+
           EM.add_timer(0.2) do
             responses.should == ["a", "b"]
             done

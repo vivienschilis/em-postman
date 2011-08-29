@@ -32,9 +32,16 @@ module EventMachine
       def onmessage(method, &callback)
         debug "##{method} registered"
 
-        handlers[method.to_s] = callback
+        handlers[method.to_s] ||= []
+        handlers[method.to_s] << callback
       end
 
+      def unlisten(method, callback)
+        if cbs = handlers[method.to_s]
+          cbs.delete(callback)
+        end
+      end
+      
       def send_message(recipient, method, body)
         message = MultiJson.encode({
           'method' => method,
@@ -83,8 +90,8 @@ module EventMachine
               else
                 debug "<- #{message}"
                 data = MultiJson.decode(message)
-                if callback = handlers[data['method'].to_s]
-                  callback.call(data['body'])
+                if (callbacks = handlers[data['method'].to_s]) && !callbacks.empty?
+                  callbacks.each {|cb| cb.call(data['body'])}
                 else
                   logger.warn "Postman[#{inbox_name}]: no handler found for #{data['method']}"
                 end

@@ -1,7 +1,7 @@
 Getting started
 ===============
 
-Postman is an Eventmachine Pub/Sub resilient to failure.
+Postman is an EventMachine Pub/Sub resilient to failure.
 Postman uses Redis lists (brpop and lpush) to send messages to subscribers into a mailbox.
 
 Postman has been designed to be resilient to failure on both side: publisher and subscriber. 

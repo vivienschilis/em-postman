@@ -8,8 +8,8 @@ Gem::Specification.new do |s|
   s.authors     = ["Vivien Schilis"]
   s.email       = ["vivien.schilis@gmail.com"]
   s.homepage    = "http://github.com/vivienschilis/em-postman"
-  s.summary     = %q{Eventmachine pub/sub using Redis list, resilient to failure}
-  s.description = %q{Eventmachine pub/sub using Redis list, resilient to failure}
+  s.summary     = %q{EventMachine pub/sub using Redis list, resilient to failure}
+  s.description = %q{EventMachine pub/sub using Redis list, resilient to failure}
 
   s.rubyforge_project = "em-postman"
 
