@@ -14,7 +14,7 @@ describe EventMachine::Postman do
       p
     }
 
-    it "should send and receve messages asynchronously" do 
+    it "should send and recieve messages asynchronously" do
         em(1) do
           postman.send_message("test", 'cb', {:value => 'abc'})
         
