@@ -18,7 +18,6 @@ require 'em-postman'
 
 EM.run {
   postman = EM::Postman.new('server')
-
   postman.onmessage(:greetings) {|data|
     puts data.inspect
     postman.send_message data['from'], :greetings, {:message => 'hello ' + data['from']}
@@ -34,7 +33,6 @@ Client postbox: (client.rb)
 require 'em-postman'
 
 EM.run {
-
   postman = EM::Postman.new('client-' + Process.pid.to_s)
   postman.onmessage(:greetings) {|data|
     puts data.inspect
