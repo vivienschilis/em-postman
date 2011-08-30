@@ -29,6 +29,10 @@ module EventMachine
         @redis ||= new_redis_client
       end
 
+      def clear
+        redis.del(inbox_name)
+      end
+
       def onmessage(method, &callback)
         debug "##{method} registered"
 
