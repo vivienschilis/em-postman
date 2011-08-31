@@ -49,3 +49,8 @@ Credits
 
 - This gem has been extracted from http://pandastream.com.
 - Thanks to Jonas Pfenniger(zimbatm) and Martyn Loughran(mloughran)
+
+License
+=======
+
+The MIT License - Copyright (c) 2011 Vivien Schilis
