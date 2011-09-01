@@ -59,9 +59,9 @@ describe EventMachine::Postman do
 
     it "should gracefully handle a Redis.rpop error" do
         em(1) do
-          redis.lpush("inbox_test", MultiJson.encode({:method => 'cb', :body => 'a'}))
-          redis.lpush("inbox_test", "error")
-          redis.lpush("inbox_test", MultiJson.encode({:method => 'cb', :body => 'b'}))
+          redis.lpush("postman:inbox_test", MultiJson.encode({:method => 'cb', :body => 'a'}))
+          redis.lpush("postman:inbox_test", "error")
+          redis.lpush("postman:inbox_test", MultiJson.encode({:method => 'cb', :body => 'b'}))
 
           responses = []
           postman.onmessage(:cb) do |msg|

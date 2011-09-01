@@ -53,7 +53,7 @@ module EventMachine
         })
 
         debug "-> #{recipient}##{method}: #{body.inspect}"
-        redis.lpush("inbox_#{recipient}", message)
+        redis.lpush("postman:inbox_#{recipient}", message)
       end
 
       def listen
@@ -77,11 +77,11 @@ module EventMachine
       end
 
       def inbox_name
-        "inbox_#{@mailbox}"
+        "postman:inbox_#{@mailbox}"
       end
 
       def debug(message)
-        logger.debug "Postman[#{inbox_name}]: #{message}"
+        logger.debug "Postman[#{mailbox}]: #{message}"
       end
 
       def listen_messages(redis = new_redis_client)
@@ -97,21 +97,21 @@ module EventMachine
                 if (callbacks = handlers[data['method'].to_s]) && !callbacks.empty?
                   callbacks.each {|cb| cb.call(data['body'])}
                 else
-                  logger.warn "Postman[#{inbox_name}]: no handler found for #{data['method']}"
+                  logger.warn "Postman[#{mailbox}]: no handler found for #{data['method']}"
                 end
                 listen_messages(redis)
               end
             rescue MultiJson::DecodeError => error
-              logger.error "Postman[#{inbox_name}]: unable to parse message #{message}"
+              logger.error "Postman[#{mailbox}]: unable to parse message #{message}"
               listen_messages(redis)
             rescue  => error
-              logger.error "Postman[#{inbox_name}]: #{error}"
+              logger.error "Postman[#{mailbox}]: #{error}"
               listen_messages(redis)
             end
           end
 
           deferable.errback do |error|
-            logger.error "Postman[#{inbox_name}]: #{error.inspect}"
+            logger.error "Postman[#{mailbox}]: #{error.inspect}"
             listen_messages(redis)
           end
         end
