@@ -44,6 +44,16 @@ EM.run {
 }
 ```
 
+EM-synchrony
+============
+
+To use em-postman with em-synchrony
+
+``` ruby
+require 'em-synchrony/em-hiredis'
+require 'em-postman/synchrony'
+```
+
 Credits
 =======
 
