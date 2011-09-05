@@ -44,7 +44,7 @@ EM.run {
 }
 ```
 
-EM-synchrony
+em-synchrony
 ============
 
 To use em-postman with em-synchrony
