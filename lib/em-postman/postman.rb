@@ -88,7 +88,7 @@ module EventMachine
         EM.next_tick do
           deferable = redis.brpop(inbox_name, @timeout)
           deferable.callback do |channel, message|
-            handle_rpop(channel, message)
+            handle_rpop(channel, message) unless channel.nil?
             listen_messages(redis)
           end
 
@@ -101,15 +101,12 @@ module EventMachine
 
       def handle_rpop(channel, message)
         begin
-          if channel.nil? # due to timeout
+          debug "<- #{message}"
+          data = MultiJson.decode(message)
+          if (callbacks = handlers[data['method'].to_s]) && !callbacks.empty?
+            callbacks.each {|cb| cb.call(data['body'])}
           else
-            debug "<- #{message}"
-            data = MultiJson.decode(message)
-            if (callbacks = handlers[data['method'].to_s]) && !callbacks.empty?
-              callbacks.each {|cb| cb.call(data['body'])}
-            else
-              logger.warn "Postman[#{mailbox}]: no handler found for #{data['method']}"
-            end
+            logger.warn "Postman[#{mailbox}]: no handler found for #{data['method']}"
           end
         rescue MultiJson::DecodeError => error
           logger.error "Postman[#{mailbox}]: unable to parse message #{message}"
