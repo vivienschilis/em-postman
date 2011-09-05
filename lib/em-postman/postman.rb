@@ -88,26 +88,8 @@ module EventMachine
         EM.next_tick do
           deferable = redis.brpop(inbox_name, @timeout)
           deferable.callback do |channel, message|
-            begin
-              if channel.nil? # due to timeout
-                listen_messages(redis)
-              else
-                debug "<- #{message}"
-                data = MultiJson.decode(message)
-                if (callbacks = handlers[data['method'].to_s]) && !callbacks.empty?
-                  callbacks.each {|cb| cb.call(data['body'])}
-                else
-                  logger.warn "Postman[#{mailbox}]: no handler found for #{data['method']}"
-                end
-                listen_messages(redis)
-              end
-            rescue MultiJson::DecodeError => error
-              logger.error "Postman[#{mailbox}]: unable to parse message #{message}"
-              listen_messages(redis)
-            rescue  => error
-              logger.error "Postman[#{mailbox}]: #{error}"
-              listen_messages(redis)
-            end
+            handle_rpop(channel, message)
+            listen_messages(redis)
           end
 
           deferable.errback do |error|
@@ -117,5 +99,23 @@ module EventMachine
         end
       end
 
+      def handle_rpop(channel, message)
+        begin
+          if channel.nil? # due to timeout
+          else
+            debug "<- #{message}"
+            data = MultiJson.decode(message)
+            if (callbacks = handlers[data['method'].to_s]) && !callbacks.empty?
+              callbacks.each {|cb| cb.call(data['body'])}
+            else
+              logger.warn "Postman[#{mailbox}]: no handler found for #{data['method']}"
+            end
+          end
+        rescue MultiJson::DecodeError => error
+          logger.error "Postman[#{mailbox}]: unable to parse message #{message}"
+        rescue  => error
+          logger.error "Postman[#{mailbox}]: #{error}"
+        end
+      end
   end
 end
